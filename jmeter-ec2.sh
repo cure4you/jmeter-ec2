@@ -157,7 +157,7 @@ function runsetup() {
 
 		# if subnet is specified
     if [ -n "$SUBNET_ID" ] ; then
-			vpcsettings="--subnet-id $SUBNET_ID --associate-public-ip-address"
+			vpcsettings="--subnet-id $SUBNET_ID"
 			spot_launch_specification="{
 				\"KeyName\": \"$AMAZON_KEYPAIR_NAME\",
 				\"ImageId\": \"$AMI_ID\",
@@ -309,7 +309,7 @@ function runsetup() {
       hosts=(`aws ec2 describe-instances --instance-ids ${attempted_instanceids[@]} \
 						--region $REGION \
 						--output text \
-						--query 'Reservations[].Instances[].PublicIpAddress'`)
+						--query 'Reservations[].Instances[].PrivateIpAddress'`)
 
       # echo "all hosts ready"
     else # Amazon probably failed to start a host [*** NOTE this is fairly common ***] so show a msg - TO DO. Could try to replace it with a new one?
@@ -325,7 +325,7 @@ function runsetup() {
       hosts=(`aws ec2 describe-instances --instance-ids ${healthy_instanceids[@]} \
 						--region $REGION \
 						--output text \
-						--query 'Reservations[].Instances[].PublicIpAddress'`)
+						--query 'Reservations[].Instances[].PrivateIpAddress'`)
 
       if [ "${#healthy_instanceids[@]}" -eq 0 ] ; then
         countof_instanceids=0
@@ -624,7 +624,7 @@ function runsetup() {
                                     $USER@${hosts[$y]}:$REMOTE_HOME/execute.jmx) &
   done
   wait
-  echo -n "done...."
+  echo "done...."
 
   # scp data dir
   if [ "$setup" = "TRUE" ] ; then
@@ -637,7 +637,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME/) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     # scp jmeter.properties
@@ -650,7 +650,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME/$JMETER_VERSION/bin/) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     # scp system.properties
@@ -663,7 +663,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME/$JMETER_VERSION/bin/) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     # scp keystore
@@ -676,7 +676,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     # scp jmeter execution file
@@ -689,7 +689,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME/$JMETER_VERSION/bin/) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     # scp any custom jar files
@@ -702,7 +702,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME/$JMETER_VERSION/lib/ext/) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     # scp any project specific custom jar files
@@ -715,7 +715,7 @@ function runsetup() {
                                         $USER@$host:$REMOTE_HOME/$JMETER_VERSION/lib/ext/) &
       done
       wait
-      echo -n "done...."
+      echo "done...."
     fi
 
     echo "all files uploaded"
@@ -980,19 +980,19 @@ progressBar() {
   tasksDone=$2
   progressDone=$3
   # Calculate number of fill/empty slots in the bar
-  progress=$(echo "$progressBarWidth/$taskCount*$tasksDone" | bc -l)
-  fill=$(printf "%.0f\n" $progress)
-  if [ $fill -gt $progressBarWidth ]; then
-    fill=$progressBarWidth
-  fi
+  # progress=$(echo "$progressBarWidth/$taskCount*$tasksDone" | bc -l)
+  fill=$(printf "0\n")
+  # if [ $fill -gt $progressBarWidth ]; then
+    # fill=$progressBarWidth
+  # fi
   empty=$(($fill-$progressBarWidth))
 
   # Percentage Calculation
-  progressPercent=$(echo "100/$taskCount*$tasksDone" | bc -l)
-  progressPercent=$(printf "%0.2f\n" $progressPercent)
-  if [[ -n "${progressPercent}" && $(echo "$progressPercent>100" | bc) -gt 0 ]]; then
+  # progressPercent=$(echo "100/$taskCount*$tasksDone" | bc -l)
+  # progressPercent=$(printf "%0.2f\n" $progressPercent)
+  # if [[ -n "${progressPercent}" && $(echo "$progressPercent>100" | bc) -gt 0 ]]; then
     progressPercent="100.00"
-  fi
+  # fi
 
   # Output to screen
   printf "\r["
